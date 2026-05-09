@@ -51,13 +51,7 @@ let rtx2 = `
 > ₊· ⫏⫏ ㅤ 🔖 Cяєα∂σя: Lʏᴏɴɴ
 `
 
-const tokensPremium = {
-  'DVLYONN': { dias: 365, nombre: '👑 PREMIUM TOTAL' },
-  'NAYDELI': { dias: 180, nombre: '🌸 PREMIUM' },
-  'RIZAR': { dias: 90, nombre: '👑 PREMIUM' },
-  'DANY': { dias: 30, nombre: '🔖 PREMIUM' }
-}
-
+const tokensValidos = ['DVLYONN', 'NAYDELI', 'RIZAR', 'DANY']
 const maxSubBots = 500
 
 let blackJBOptions = {}
@@ -110,26 +104,20 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
     `.trim())
   }
 
-  let userData = global.db.data.users[m.sender]
-  let isPremium = userData.premium === true && userData.premiumTime > Date.now()
-
-  if (!isPremium) {
-    let time = global.db.data.users[m.sender].Subs + 120000
-    if (new Date() - global.db.data.users[m.sender].Subs < 120000) {
-      let remaining = time - new Date()
-      setTimeout(() => {
-        conn.reply(m.chat, `✅ Yα єѕтαѕ ℓιѕтσ ραяα ¢σηє¢тαятє ∂є ηυєνσ`, m)
-      }, remaining)
-      return conn.reply(m.chat, `
+  let time = global.db.data.users[m.sender].Subs + 120000
+  if (new Date() - global.db.data.users[m.sender].Subs < 120000) {
+    let remaining = time - new Date()
+    setTimeout(() => {
+      conn.reply(m.chat, `✅ Yα єѕтαѕ ℓιѕтσ ραяα ¢σηє¢тαятє ∂є ηυєνσ`, m)
+    }, remaining)
+    return conn.reply(m.chat, `
 ㅤ    ꒰  ㅤ ⏳ ㅤ *αℓуα - вσт* ㅤ ⫏⫏  ꒱
 ㅤ    ⿻ ㅤ ✿ ㅤ єѕρєяα 木 тιємρσ ㅤ 性
 
 > ₊· ⫏⫏ ㅤ Eѕρєяα ${msToTime(remaining)} αηтєѕ ∂є νιη¢υℓαя
-> ₊· ⫏⫏ ㅤ 🎫 *Premium:* Usa #code <TOKEN> para saltar espera
 
 ㅤ    ꒰  ㅤ ✿ ㅤ *αℓуα - вσт* ㅤ ⫏⫏ ꒱
-      `.trim(), m)
-    }
+    `.trim(), m)
   }
 
   const subBots = [...new Set(
@@ -139,15 +127,14 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
   )]
 
   const subBotsCount = subBots.length
-  const limiteSubBots = isPremium ? 20 : 5
 
-  if (subBotsCount >= limiteSubBots) {
+  if (subBotsCount >= maxSubBots) {
     return m.reply(`
 ㅤ    ꒰  ㅤ ❌ ㅤ *αℓуα - вσт* ㅤ ⫏⫏  ꒱
 ㅤ    ⿻ ㅤ ✿ ㅤ ℓιмιтє 木 αℓ¢αηzα∂σ ㅤ 性
 
-> ₊· ⫏⫏ ㅤ Líмιтє: ${limiteSubBots} ѕυв-вσтѕ
-${!isPremium ? `> ₊· ⫏⫏ ㅤ 🎫 *Premium:* Usa #code <TOKEN> para tener 20` : ''}
+> ₊· ⫏⫏ ㅤ Líмιтє dє *${maxSubBots} ѕυв-вσтѕ* αℓ¢αηzα∂σ
+> ₊· ⫏⫏ ㅤ Nσ ѕє ρυє∂єη ¢σηє¢тαя máѕ
 
 ㅤ    ꒰  ㅤ ✿ ㅤ *αℓуα - вσт* ㅤ ⫏⫏ ꒱
     `.trim())
@@ -183,30 +170,32 @@ export default handler
 export async function alyaJadiBot(options) {
   let { pathblackJadiBot, m, conn, args, usedPrefix, command } = options
   
-  let esToken = args[0] && tokensPremium[args[0].toUpperCase()]
+  let esToken = args[0] && tokensValidos.includes(args[0].toUpperCase())
   
   if (command === 'code' && esToken) {
     let token = args[0].toUpperCase()
-    let tiempo = tokensPremium[token].dias * 86400000
-    let expiracion = Date.now() + tiempo
     
-    let user = global.db.data.users[m.sender]
-    user.premium = true
-    user.premiumTime = expiracion
-    user.premiumToken = token
+    let sock = makeWASocket({
+      logger: pino({ level: 'silent' }),
+      printQRInTerminal: false,
+      browser: Browsers.macOS("Chrome"),
+      auth: { creds: { account: undefined } }
+    })
+    
+    let secret = await sock.requestPairingCode(m.sender.split('@')[0])
+    secret = secret.match(/.{1,4}/g)?.join("-")
     
     await conn.sendMessage(m.chat, {
       text: `
-ㅤ    ꒰  ㅤ ✅ ㅤ *αℓуα - вσт* ㅤ ⫏⫏  ꒱
-ㅤ    ⿻ ㅤ ✿ ㅤ ρяємιυм 木 α¢тινα∂σ ㅤ 性
+ㅤ    ꒰  ㅤ 🔐 ㅤ *αℓуα - ѕυв вσт* ㅤ ⫏⫏  ꒱
+ㅤ    ⿻ ㅤ ✿ ㅤ ¢ó∂ιgσ 木 ѕє¢яєтσ ㅤ 性
 
-> ₊· ⫏⫏ ㅤ *👤 Usuario:* @${m.sender.split('@')[0]}
-> ₊· ⫏⫏ ㅤ *🎫 Token:* ${token}
-> ₊· ⫏⫏ ㅤ *🎁 Tipo:* ${tokensPremium[token].nombre}
-> ₊· ⫏⫏ ㅤ *📅 Expira:* ${new Date(expiracion).toLocaleDateString()}
-> ₊· ⫏⫏ ㅤ *🎉 Beneficios:* Sin cooldown + 20 sub-bots
+> ₊· ⫏⫏ ㅤ *🎫 Token usado:* ${token}
+> ₊· ⫏⫏ ㅤ *🔑 Código:* ${secret}
 
 ㅤ    ꒰  ㅤ ✿ ㅤ *αℓуα - вσт* ㅤ ⫏⫏ ꒱
+> ₊· ⫏⫏ ㅤ Ingresa este código en WhatsApp:
+> ₊· ⫏⫏ ㅤ Ajustes > Dispositivos vinculados
       `.trim(),
       mentions: [m.sender]
     })
@@ -217,6 +206,7 @@ export async function alyaJadiBot(options) {
     command = 'qr'
     args.unshift('code')
   }
+  
   const mcode = args[0] && (/--code|code/.test(args[0].trim()))
     ? true
     : args[1] && (/--code|code/.test(args[1].trim()))
@@ -333,10 +323,7 @@ export async function alyaJadiBot(options) {
       )
 
       await updateSubBotProfilePicture(sock, 'https://files.catbox.moe/z4qgf1.jpeg')
-      
-      let userPremium = global.db.data.users[m.sender]
-      let nombreSubBot = (userPremium && userPremium.premium) ? 'Alya-Pro' : 'Alya-Sub-Bot'
-      await updateSubBotName(sock, nombreSubBot)
+      await updateSubBotName(sock, 'Alya-Sub-Bot')
 
       sock.isInit = true
       global.conns.push(sock)
@@ -356,7 +343,7 @@ export async function alyaJadiBot(options) {
 ㅤ    ⿻ ㅤ ✿ ㅤ ¢σηє¢тα∂σ 木 ✨ ㅤ 性
 
 > ₊· ⫏⫏ ㅤ @${m.sender.split('@')[0]} Yα єяєѕ ραятє ∂є αℓуα
-> ₊· ⫏⫏ ㅤ *Nσмвяє:* ${nombreSubBot}
+> ₊· ⫏⫏ ㅤ *Nσмвяє:* Aℓуα-Sυв-Bσт
 > ₊· ⫏⫏ ㅤ *Fσтσ:* Aℓуα ρяιη¢ιραℓ
 
 ㅤ    ꒰  ㅤ ✿ ㅤ *αℓуα - вσт* ㅤ ⫏⫏ ꒱
