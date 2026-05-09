@@ -1,12 +1,10 @@
-import fetch from 'node-fetch'
-
 let handler = async (m, { conn, text, usedPrefix }) => {
   if (!text) return m.reply(`
 ㅤ    ꒰  ㅤ 📹 ㅤ *αℓуα - νι∂єσ* ㅤ ⫏⫏  ꒱
-ㅤ    ⿻ ㅤ ✿ ㅤ υsσ 木 cσrrєctσ ㅤ 性
+ㅤ    ⿻ ㅤ ✿ ㅤ υѕσ 木 cσrrєctσ ㅤ 性
 
-> ₊· ⫏⫏ ㅤ *υsσ:* ${usedPrefix}νι∂єσ <cαnción σ νι∂єσ>
-> ₊· ⫏⫏ ㅤ *єjємρℓσ:* ${usedPrefix}νι∂єσ Bad Bunny
+> ₊· ⫏⫏ ㅤ *Uѕσ:* ${usedPrefix}νι∂єσ <cαnción σ νι∂єσ>
+> ₊· ⫏⫏ ㅤ *Ejeмρℓσ:* ${usedPrefix}νι∂єσ Acento
 
 ㅤ    ꒰  ㅤ ✿ ㅤ *αℓуα - вσт* ㅤ ⫏⫏ ꒱
   `.trim())
@@ -60,12 +58,12 @@ let handler = async (m, { conn, text, usedPrefix }) => {
 ㅤ    ⿻ ㅤ ✿ ㅤ єท αíяє 木 🎬 ㅤ 性
 
 > ₊· ⫏⫏ ㅤ *τíτυℓσ:* ${downloadData.result.title || video.title}
-> ₊· ⫏⫏ ㅤ *∂υrαción:* ${downloadData.result.duration || video.duration}
-> ₊· ⫏⫏ ㅤ *cяєα∂σr:* ${video.channel}
-> ₊· ⫏⫏ ㅤ *👁️ νιѕтαѕ:* ${video.views}
+> ₊· ⫏⫏ ㅤ *∂υяα¢ιón:* ${downloadData.result.duration || video.duration}
+> ₊· ⫏⫏ ㅤ *¢αηαℓ:* ${video.channel}
+> ₊· ⫏⫏ ㅤ *👁️ Vιѕтαѕ:* ${video.views}
 
 ㅤ    ꒰  ㅤ ✿ ㅤ *αℓуα - вσт* ㅤ ⫏⫏ ꒱
-> ₊· ⫏⫏ ㅤ *αρι:* https://dvlyonn.onrender.com
+> ₊· ⫏⫏ ㅤ *API:* https://dvlyonn.onrender.com
     `.trim()
 
     await conn.sendMessage(m.chat, {
@@ -93,13 +91,13 @@ let handler = async (m, { conn, text, usedPrefix }) => {
 > ₊· ⫏⫏ ㅤ *єrrσr:* ${error.message}
 
 ㅤ    ꒰  ㅤ ✿ ㅤ *αℓуα - вσт* ㅤ ⫏⫏ ꒱
-> ₊· ⫏⫏ ㅤ *αρι:* https://dvlyonn.onrender.com
+> ₊· ⫏⫏ ㅤ *API:* https://dvlyonn.onrender.com
     `.trim())
     await m.react('❌')
   }
 }
 
-handler.help = ['ytvideo']
+handler.help = ['video']
 handler.tags = ['downloader']
 handler.command = ['video', 'ytvideo', 'descargarvideo']
 
