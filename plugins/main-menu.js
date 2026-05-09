@@ -21,7 +21,6 @@ const defaultMenu = {
 ㅤ
 ㅤ    ꒰  ㅤ ✿ ㅤ *αℓуα - вσт* ㅤ ⫏⫏  ꒱
 ㅤ    ⿻ ㅤ 性 ㅤ ѕιѕтємα єנє¢υтα∂σ ㅤ ✿
-> ₊· ⫏⫏ ㅤ #ριηg ─ 📡 *єѕтα∂σ ∂єℓ вσт*
 ㅤ
 ㅤ    ꒰  ㅤ 🕸️ ㅤ *¢яєα∂σ ρσя ℓуσηη* ㅤ ⫏⫏  ꒱
 > ₊· ⫏⫏ ㅤ ✿ 木 性 ㅤ αℓуα
@@ -91,7 +90,7 @@ let handler = async (m, { conn, usedPrefix }) => {
     register: 'яєgιѕтєя',
     anime: 'αηιмє',
     info: 'ιηƒσ'
-}
+  }
 
   const text = [
     menu.before,
@@ -111,7 +110,16 @@ let handler = async (m, { conn, usedPrefix }) => {
     ? fs.readFileSync(menuMedia.thumbnail)
     : defaultThumb
 
-  // ContextInfo con el newsletter para que aparezca el botón "Ver canal"
+  const uniqueThumb = Buffer.concat([thumb, Buffer.from(botJid)])
+
+  const buttons = [
+    { 
+      buttonId: `${usedPrefix}ping`, 
+      buttonText: { displayText: '📡 PING' }, 
+      type: 1 
+    }
+  ]
+
   const contextInfo = {
     mentionedJid: [m.sender],
     isForwarded: true,
@@ -124,9 +132,12 @@ let handler = async (m, { conn, usedPrefix }) => {
   }
 
   await conn.sendMessage(m.chat, {
-    image: thumb,
+    image: uniqueThumb,
     caption: text,
-    contextInfo: contextInfo
+    contextInfo: contextInfo,
+    buttons: buttons,
+    footer: 'αℓуα - вσт',
+    headerType: 1
   }, { quoted: m })
 }
 
