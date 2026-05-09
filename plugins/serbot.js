@@ -55,7 +55,7 @@ const tokensPremium = {
   'DVLYONN': { dias: 365, nombre: '👑 PREMIUM TOTAL' },
   'NAYDELI': { dias: 180, nombre: '🌸 PREMIUM' },
   'RIZAR': { dias: 90, nombre: '👑 PREMIUM' },
-  'DANY': { dias: 30, nombre: '💗 PREMIUM' }
+  'DANY': { dias: 30, nombre: '🔖 PREMIUM' }
 }
 
 const maxSubBots = 500
@@ -113,21 +113,23 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
   let userData = global.db.data.users[m.sender]
   let isPremium = userData.premium === true && userData.premiumTime > Date.now()
 
-  let time = global.db.data.users[m.sender].Subs + 120000
-  if (!isPremium && (new Date() - global.db.data.users[m.sender].Subs < 120000)) {
-    let remaining = time - new Date()
-    setTimeout(() => {
-      conn.reply(m.chat, `✅ Yα єѕтαѕ ℓιѕтσ ραяα ¢σηє¢тαятє ∂є ηυєνσ`, m)
-    }, remaining)
-    return conn.reply(m.chat, `
+  if (!isPremium) {
+    let time = global.db.data.users[m.sender].Subs + 120000
+    if (new Date() - global.db.data.users[m.sender].Subs < 120000) {
+      let remaining = time - new Date()
+      setTimeout(() => {
+        conn.reply(m.chat, `✅ Yα єѕтαѕ ℓιѕтσ ραяα ¢σηє¢тαятє ∂є ηυєνσ`, m)
+      }, remaining)
+      return conn.reply(m.chat, `
 ㅤ    ꒰  ㅤ ⏳ ㅤ *αℓуα - вσт* ㅤ ⫏⫏  ꒱
 ㅤ    ⿻ ㅤ ✿ ㅤ єѕρєяα 木 тιємρσ ㅤ 性
 
-> ₊· ⫏⫏ ㅤ *Eѕρєяα ${msToTime(remaining)}*
-> ₊· ⫏⫏ ㅤ *🎫 Premium:* Usa #code <TOKEN> para saltar espera
+> ₊· ⫏⫏ ㅤ Eѕρєяα ${msToTime(remaining)} αηтєѕ ∂є νιη¢υℓαя
+> ₊· ⫏⫏ ㅤ 🎫 *Premium:* Usa #code <TOKEN> para saltar espera
 
 ㅤ    ꒰  ㅤ ✿ ㅤ *αℓуα - вσт* ㅤ ⫏⫏ ꒱
-    `.trim(), m)
+      `.trim(), m)
+    }
   }
 
   const subBots = [...new Set(
@@ -153,7 +155,7 @@ ${!isPremium ? `> ₊· ⫏⫏ ㅤ 🎫 *Premium:* Usa #code <TOKEN> para tener 
 
   let who = m.mentionedJid && m.mentionedJid[0] ? m.mentionedJid[0] : m.fromMe ? conn.user.jid : m.sender
   let id = `${who.split('@')[0]}`
-  let pathblackJadiBot = path.join(process.cwd(), 'subBot', id)
+  let pathblackJadiBot = path.join(process.cwd(), 'Alya-Bot', 'subBot', id)
 
   if (!fs.existsSync(pathblackJadiBot)) {
     fs.mkdirSync(pathblackJadiBot, { recursive: true })
@@ -215,7 +217,6 @@ export async function alyaJadiBot(options) {
     command = 'qr'
     args.unshift('code')
   }
-  
   const mcode = args[0] && (/--code|code/.test(args[0].trim()))
     ? true
     : args[1] && (/--code|code/.test(args[1].trim()))
