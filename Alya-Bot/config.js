@@ -7,16 +7,11 @@ import fetch from 'node-fetch';
 import axios from 'axios';
 import moment from 'moment-timezone';
 
-//*─🌸─ CONFIGURACIÓN GLOBAL ─🌸─*
-
-// Número del bot
 global.botNumber = '';
 
-//*─ׄ─ׅ─ׄ─🌸─ׄ─ׅ─ׄ─🌸─ׄ─ׅ─ׄ─🌸─ׄ─ׅ─ׄ─🌸─ׄ─ׅ─ׄ─🌸─ׄ─ׅ─ׄ─*
-// ========== DETECCIÓN DE LA CREADORA ==========
 global.owner = [
   ['50497305037', '🎭 ℓʏσηη', true],
-  50497305037@s.whatsapp.net', 'ℓʏσηη', true],
+  ['50497305037@s.whatsapp.net', 'ℓʏσηη', true],
   ['59177474230@c.us', 'ℓʏσηη', true],
   ['529711232646', '🌸 ℓυz', true],
   ['529711232646@s.whatsapp.net', 'ℓυz', true],
@@ -29,11 +24,10 @@ global.owner = [
   ['18495764630@c.us', 'Madara', true]
 ];
 
-global.mods = ['50497305037', '50497305037', '529711232646', '529711232646@s.whatsapp.net', '5219611207992', '5219611207992@s.whatsapp.net', '18495764630', '18495764630@s.whatsapp.net'];
+global.mods = ['50497305037', '50497305037@s.whatsapp.net', '529711232646', '529711232646@s.whatsapp.net', '5219611207992', '5219611207992@s.whatsapp.net', '18495764630', '18495764630@s.whatsapp.net'];
 global.suittag = ['59177474230', '529711232646', '5219611207992', '18495764630'];
 global.prems = ['59177474230', '59177474230@s.whatsapp.net', '529711232646', '529711232646@s.whatsapp.net', '5219611207992', '5219611207992@s.whatsapp.net', '18495764630', '18495764630@s.whatsapp.net'];
 
-//*─ׄ─ׅ─ׄ─🌸─ׄ─ׅ─ׄ─🌸─ׄ─ׅ─ׄ─🌸─ׄ─ׅ─ׄ─🌸─ׄ─ׅ─ׄ─🌸─ׄ─ׅ─ׄ─*
 global.libreria = 'Baileys';
 global.baileys = 'V 6.7.9';
 global.languaje = 'Español';
@@ -44,7 +38,6 @@ global.sessions = 'AlyaSesions';
 global.jadi = 'AlyaJadiBot';
 global.blackJadibts = true;
 
-//*─ׄ─ׅ─ׄ─🌸─ׄ─ׅ─ׄ─🌸─ׄ─ׅ─ׄ─🌸─ׄ─ׅ─ׄ─🌸─ׄ─ׅ─ׄ─🌸─ׄ─ׅ─ׄ─*
 global.packsticker = `
 ㅤ    ꒰  ㅤ 🌸 ㅤ *αℓуα - вσт* ㅤ ⫏⫏  ꒱
 ㅤ    ⿻ ㅤ ✿ ㅤ ѕтι¢кєя 木 ✨ ㅤ 性
@@ -56,7 +49,6 @@ global.packname = 'αℓуα - вσт';
 global.author = `
 ㅤ    ꒰  ㅤ ✿ ㅤ *αℓуα - вσт* ㅤ ⫏⫏ ꒱`;
 
-//*─ׄ─ׅ─ׄ─🌸─ׄ─ׅ─ׄ─🌸─ׄ─ׅ─ׄ─🌸─ׄ─ׅ─ׄ─🌸─ׄ─ׅ─ׄ─🌸─ׄ─ׅ─ׄ─*
 global.wm = 'αℓуα - вσт';
 global.titulowm = 'αℓуα - вσт';
 global.igfg = 'ℓʏσηη';
@@ -66,10 +58,8 @@ global.textbot = 'αℓуα - вσт : ℓʏσηη';
 global.gt = 'αℓуα - вσт';
 global.namechannel = 'αℓуα - вσт / ℓʏσηη';
 
-// Moneda interna
 global.monedas = 'мσηє∂αѕ';
 
-//*─ׄ─ׅ─ׄ─🌸─ׄ─ׅ─ׄ─🌸─ׄ─ׅ─ׄ─🌸─ׄ─ׅ─ׄ─🌸─ׄ─ׅ─ׄ─🌸─ׄ─ׅ─ׄ─*
 global.gp1 = 'https://chat.whatsapp.com/LPHJXnuklWy62oyHB3FJoQ';
 global.gp2 = 'https://chat.whatsapp.com/LPHJXnuklWy62oyHB3FJoQ';
 global.comunidad1 = 'https://chat.whatsapp.com/LPHJXnuklWy62oyHB3FJoQ';
@@ -79,7 +69,6 @@ global.yt = 'https://youtube.com/@Lyonn';
 global.md = 'https://github.com/Lyonn/Alya-Bot';
 global.correo = 'lyonn@alyabot.com';
 
-//*─ׄ─ׅ─ׄ─🌸─ׄ─ׅ─ׄ─🌸─ׄ─ׅ─ׄ─🌸─ׄ─ׅ─ׄ─🌸─ׄ─ׅ─ׄ─🌸─ׄ─ׅ─ׄ─*
 global.catalogo = null;
 try {
     const catalogoPath = new URL('../src/catalogo.jpg', import.meta.url);
@@ -94,7 +83,6 @@ try {
 
 global.photoSity = global.catalogo ? [global.catalogo] : [];
 
-//*─ׄ─ׅ─ׄ─🌸─ׄ─ׅ─ׄ─🌸─ׄ─ׅ─ׄ─🌸─ׄ─ׅ─ׄ─🌸─ׄ─ׅ─ׄ─🌸─ׄ─ׅ─ׄ─*
 global.estilo = { 
   key: {  
     fromMe: false, 
@@ -116,18 +104,15 @@ global.estilo = {
 global.ch = { ch1: "" };
 global.rcanal = global.ch.ch1;
 
-//*─ׄ─ׅ─ׄ─🌸─ׄ─ׅ─ׄ─🌸─ׄ─ׅ─ׄ─🌸─ׄ─ׅ─ׄ─🌸─ׄ─ׅ─ׄ─🌸─ׄ─ׅ─ׄ─*
 global.cheerio = cheerio;
 global.fs = fs;
 global.fetch = fetch;
 global.axios = axios;
 global.moment = moment;
 
-//*─ׄ─ׅ─ׄ─🌸─ׄ─ׅ─ׄ─🌸─ׄ─ׅ─ׄ─🌸─ׄ─ׅ─ׄ─🌸─ׄ─ׅ─ׄ─🌸─ׄ─ׅ─ׄ─*
 global.multiplier = 69;
 global.maxwarn = 3;
 
-//*─ׄ─ׅ─ׄ─🌸─ׄ─ׅ─ׄ─🌸─ׄ─ׅ─ׄ─🌸─ׄ─ׅ─ׄ─🌸─ׄ─ׅ─ׄ─🌸─ׄ─ׅ─ׄ─*
 const file = fileURLToPath(import.meta.url);
 watchFile(file, () => {
   unwatchFile(file);
