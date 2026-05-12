@@ -1,10 +1,11 @@
+
+import fetch from 'node-fetch'
+import fs from 'fs'
+import path from 'path'
 import {
   generateWAMessageFromContent,
   proto
 } from '@whiskeysockets/baileys'
-import fetch from 'node-fetch'
-import fs from 'fs'
-import path from 'path'
 
 let descargas = {}
 
@@ -31,12 +32,12 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     }
 
     const interactiveMessage = proto.Message.InteractiveMessage.create({
-      header: { title: 'αℓуα - ∂σωηℓσα∂єя', subtitle: 'Youtube a Mp3', hasMediaAttachment: false },
-      body: { text: `ㅤ    ꒰ 🎵 *αℓуα - ∂σωηℓσα∂єя* ⫏⫏ ꒱
+      header: { title: 'αℓуα - ρℓαу', subtitle: 'Youtube a Mp3', hasMediaAttachment: false },
+      body: { text: `ㅤ    ꒰ 🎵 *αℓуα - ρℓαу* ⫏⫏ ꒱
 ㅤ    ⿻ ✿ ιηƒσ 木 αтт 性
 
-> ₊· Cσℓσ¢α єℓ єηℓα¢є ∂є Youtube
-> ₊· Eᴊᴇᴍᴘʟᴏ: https://youtu.be/M0qv9fTlfdc` },
+> ₊· Uѕσ: *${usedPrefix + command} + link*
+> ₊· Eᴊᴇᴍᴘʟᴏ: *${usedPrefix + command} https://youtu.be/M0qv9fTlfdc*` },
       footer: { text: '⫏⫏ αℓуα - вσт ✿' },
       nativeFlowMessage: { buttons: [buttons] }
     })
@@ -54,23 +55,20 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     return
   }
 
+  await m.react('🎵')
+
   let url = text.trim()
   
   if (!url.includes('youtu.be') && !url.includes('youtube.com')) {
     return m.reply(`❌ Link inválido\n\n${usedPrefix + command} https://youtu.be/M0qv9fTlfdc`)
   }
 
-  await m.react('📥')
-
   try {
-    const apiUrl = `https://dvlyonnxz.onrender.com/download/ytaudio?url=${url}`
-    
+    const apiUrl = `https://dvlyonnxz.onrender.com/download/ytaudio?url=${encodeURIComponent(url)}`
     const response = await fetch(apiUrl)
     const data = await response.json()
 
-    if (!data.status || !data.result) {
-      throw new Error('API error')
-    }
+    if (!data.status || !data.result) throw new Error('Error')
 
     const { title, duration, thumbnail, download_url } = data.result
     
@@ -78,21 +76,10 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     const segundos = duration % 60
     const duracion = `${minutos}:${segundos.toString().padStart(2, '0')}`
 
-    const tmpDir = path.join(process.cwd(), 'tmp')
-    if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true })
-
-    const thumbPath = path.join(tmpDir, `thumb_${Date.now()}.jpg`)
-    const thumbRes = await fetch(thumbnail)
-    const thumbBuffer = await thumbRes.buffer()
-    fs.writeFileSync(thumbPath, thumbBuffer)
-
-    const media = await conn.prepareWAMessageMedia({ image: fs.readFileSync(thumbPath) }, { upload: conn.waUploadToServer })
-
     const gameId = m.chat
     descargas[gameId] = {
       url: download_url,
-      title: title,
-      duracion: duracion
+      title: title
     }
 
     setTimeout(() => {
@@ -111,7 +98,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
                 header: '📥 TOCA PARA DESCARGAR',
                 title: title.substring(0, 35),
                 description: `Duración: ${duracion}`,
-                id: `download_${gameId}`
+                id: `audio_${gameId}`
               }
             ]
           }
@@ -120,8 +107,8 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     }
 
     const interactiveMessage = proto.Message.InteractiveMessage.create({
-      header: { title: 'αℓуα - ∂σωηℓσα∂єя', subtitle: 'Youtube a Mp3', hasMediaAttachment: true, imageMessage: media.imageMessage },
-      body: { text: `ㅤ    ꒰ 🎵 *αℓуα - ∂σωηℓσα∂єя* ⫏⫏ ꒱
+      header: { title: 'αℓуα - ρℓαу', subtitle: 'Youtube a Mp3', hasMediaAttachment: false },
+      body: { text: `ㅤ    ꒰ 🎵 *αℓуα - ρℓαу* ⫏⫏ ꒱
 ㅤ    ⿻ ✿ ιηƒσ 木 αтт 性
 
 > ₊· *Título:* ${title}
@@ -141,11 +128,9 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     }, { quoted: m })
 
     await conn.relayMessage(m.chat, msg.message, { messageId: msg.key.id })
-    fs.unlinkSync(thumbPath)
 
   } catch (error) {
-    console.log(error)
-    m.reply(`❌ Error al procesar el enlace\n\nVerifica que el enlace sea válido`)
+    m.reply(`❌ Error al procesar el enlace`)
   }
 }
 
@@ -156,9 +141,9 @@ handler.before = async (m, { conn }) => {
   try {
     const data = JSON.parse(nativeFlow.paramsJson || '{}')
     const id = data.id || data.selectedId || data.selectedRowId || null
-    if (!id || !id.startsWith('download_')) return false
+    if (!id || !id.startsWith('audio_')) return false
 
-    const gameId = id.replace('download_', '')
+    const gameId = id.replace('audio_', '')
     const descarga = descargas[gameId]
     
     if (!descarga) {
@@ -194,8 +179,9 @@ handler.before = async (m, { conn }) => {
   }
 }
 
-handler.help = ['ytmp3 <link>']
+
+handler.help = ['ytmp3 <link]']
 handler.tags = ['downloader']
-handler.command = ['play2', 'ytmp3']
+handler.command = ['ytmp3']
 
 export default handler
