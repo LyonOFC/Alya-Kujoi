@@ -6,6 +6,8 @@ import fetch from 'node-fetch'
 import fs from 'fs'
 import path from 'path'
 
+let descargas = {}
+
 let handler = async (m, { conn, text, usedPrefix, command }) => {
   if (!text) {
     const buttons = {
@@ -52,13 +54,13 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     return
   }
 
-  await m.react('📥')
-
   let url = text.trim()
   
   if (!url.includes('youtu.be') && !url.includes('youtube.com')) {
     return m.reply(`❌ Link inválido\n\n${usedPrefix + command} https://youtu.be/M0qv9fTlfdc`)
   }
+
+  await m.react('📥')
 
   try {
     const apiUrl = `https://dvlyonnxz.onrender.com/download/ytaudio?url=${encodeURIComponent(url)}`
@@ -76,30 +78,37 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     const tmpDir = path.join(process.cwd(), 'tmp')
     if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true })
 
-    const audioPath = path.join(tmpDir, `${Date.now()}.mp3`)
     const thumbPath = path.join(tmpDir, `thumb_${Date.now()}.jpg`)
-
     const thumbRes = await fetch(thumbnail)
     const thumbBuffer = await thumbRes.buffer()
     fs.writeFileSync(thumbPath, thumbBuffer)
 
-    const audioRes = await fetch(download_url)
-    const audioBuffer = await audioRes.buffer()
-    fs.writeFileSync(audioPath, audioBuffer)
+    const media = await conn.prepareWAMessageMedia({ image: fs.readFileSync(thumbPath) }, { upload: conn.waUploadToServer })
+
+    const gameId = m.chat
+    descargas[gameId] = {
+      url: download_url,
+      title: title,
+      duracion: duracion
+    }
+
+    setTimeout(() => {
+      if (descargas[gameId]) delete descargas[gameId]
+    }, 60000)
 
     const buttons = {
       name: 'single_select',
       buttonParamsJson: JSON.stringify({
-        title: '🎵 DESCARGA COMPLETADA',
+        title: '🎵 DESCARGA',
         sections: [
           {
-            title: '✅ CANCIÓN LISTA',
+            title: '✅ CANCIÓN ENCONTRADA',
             rows: [
               {
-                header: '📥 AUDIO MP3',
+                header: '📥 TOCA PARA DESCARGAR',
                 title: title,
                 description: `Duración: ${duracion}`,
-                id: `${usedPrefix}menu`
+                id: `download_${gameId}`
               }
             ]
           }
@@ -108,15 +117,13 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     }
 
     const interactiveMessage = proto.Message.InteractiveMessage.create({
-      header: { title: 'αℓуα - ∂σωηℓσα∂єя', subtitle: 'Youtube a Mp3', hasMediaAttachment: true, imageMessage: (await prepareWAMessageMedia({ image: fs.readFileSync(thumbPath) }, { upload: conn.waUploadToServer })).imageMessage },
+      header: { title: 'αℓуα - ∂σωηℓσα∂єя', subtitle: 'Youtube a Mp3', hasMediaAttachment: true, imageMessage: media.imageMessage },
       body: { text: `ㅤ    ꒰ 🎵 *αℓуα - ∂σωηℓσα∂єя* ⫏⫏ ꒱
 ㅤ    ⿻ ✿ ιηƒσ 木 αтт 性
 
 > ₊· *Título:* ${title}
 > ₊· *Duración:* ${duracion}
-> ₊· *Tamaño:* ~${(duration * 16).toFixed(1)}KB
-
-✅ *Descarga completada*` },
+> ₊· *Toca el botón para descargar*` },
       footer: { text: '⫏⫏ αℓуα - вσт ✿' },
       nativeFlowMessage: { buttons: [buttons] }
     })
@@ -131,28 +138,59 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     }, { quoted: m })
 
     await conn.relayMessage(m.chat, msg.message, { messageId: msg.key.id })
+    fs.unlinkSync(thumbPath)
+
+  } catch (error) {
+    m.reply(`❌ Error al procesar el enlace`)
+  }
+}
+
+handler.before = async (m, { conn }) => {
+  const nativeFlow = m.message?.interactiveResponseMessage?.nativeFlowResponseMessage
+  if (!nativeFlow) return false
+
+  try {
+    const data = JSON.parse(nativeFlow.paramsJson || '{}')
+    const id = data.id || data.selectedId || data.selectedRowId || null
+    if (!id || !id.startsWith('download_')) return false
+
+    const gameId = id.replace('download_', '')
+    const descarga = descargas[gameId]
+    
+    if (!descarga) {
+      await conn.sendMessage(m.chat, { text: `❌ El enlace expiró. Usa *play* nuevamente.` }, { quoted: m })
+      return true
+    }
+
+    await conn.sendMessage(m.chat, { text: `⏳ *Descargando ${descarga.title}...*` }, { quoted: m })
+
+    const tmpDir = path.join(process.cwd(), 'tmp')
+    if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true })
+
+    const audioPath = path.join(tmpDir, `${Date.now()}.mp3`)
+    const audioRes = await fetch(descarga.url)
+    const audioBuffer = await audioRes.buffer()
+    fs.writeFileSync(audioPath, audioBuffer)
 
     await conn.sendMessage(m.chat, {
       audio: fs.readFileSync(audioPath),
       mimetype: 'audio/mpeg',
-      fileName: `${title}.mp3`
+      fileName: `${descarga.title}.mp3`
     }, { quoted: m })
 
     fs.unlinkSync(audioPath)
-    fs.unlinkSync(thumbPath)
+    delete descargas[gameId]
     await m.react('✅')
 
-  } catch (error) {
-    m.reply(`❌ Error al descargar`)
+    return true
+
+  } catch (e) {
+    console.error(e)
+    return true
   }
 }
 
-const prepareWAMessageMedia = async (media, { upload }) => {
-  const { generateWAMessageContent } = await import('@whiskeysockets/baileys')
-  return await generateWAMessageContent(media, { upload })
-}
-
-handler.help = ['ytmp3 <lin>']
+handler.help = ['ytmp3 <link>']
 handler.tags = ['downloader']
 handler.command = ['play2', 'ytmp3']
 
