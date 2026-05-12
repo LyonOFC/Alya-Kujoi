@@ -75,21 +75,6 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     const segundos = duration % 60
     const duracion = `${minutos}:${segundos.toString().padStart(2, '0')}`
 
-    const tmpDir = path.join(process.cwd(), 'tmp')
-    if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true })
-
-    let media = null
-    if (thumbnail) {
-      const thumbPath = path.join(tmpDir, `thumb_${Date.now()}.jpg`)
-      const thumbRes = await fetch(thumbnail)
-      if (thumbRes.ok) {
-        const thumbBuffer = await thumbRes.buffer()
-        fs.writeFileSync(thumbPath, thumbBuffer)
-        media = await conn.prepareWAMessageMedia({ image: fs.readFileSync(thumbPath) }, { upload: conn.waUploadToServer })
-        fs.unlinkSync(thumbPath)
-      }
-    }
-
     const gameId = m.chat
     descargas[gameId] = {
       url: download_url,
@@ -121,12 +106,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     }
 
     const interactiveMessage = proto.Message.InteractiveMessage.create({
-      header: { 
-        title: 'αℓуα - ρℓαу', 
-        subtitle: 'Youtube a Mp3', 
-        hasMediaAttachment: !!media,
-        imageMessage: media ? media.imageMessage : undefined
-      },
+      header: { title: 'αℓуα - ρℓαу', subtitle: 'Youtube a Mp3', hasMediaAttachment: false },
       body: { text: `ㅤ    ꒰ 🎵 *αℓуα - ρℓαу* ⫏⫏ ꒱
 ㅤ    ⿻ ✿ ιηƒσ 木 αтт 性
 
